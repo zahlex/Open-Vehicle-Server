@@ -140,17 +140,17 @@ sub drupal_tim
   AE::log info => '- - - Periodic Drupal maintenance';
 
   FunctionCall('DbDoSQL',
-    'INSERT INTO ovms_owners SELECT uid,name,mail,pass,status,0,utc_timestamp() FROM users '
-  . 'WHERE users.uid NOT IN (SELECT owner FROM ovms_owners)');
+    'INSERT INTO ovms_owners SELECT uid,name,mail,pass,status,0,utc_timestamp() FROM users_field_data '
+  . 'WHERE users_field_data.uid NOT IN (SELECT owner FROM ovms_owners) AND users_field_data.status!=0');
 
   FunctionCall('DbDoSQL',
-    'UPDATE ovms_owners LEFT JOIN users ON users.uid=ovms_owners.owner '
-  . 'SET ovms_owners.pass=users.pass, ovms_owners.status=users.status, ovms_owners.name=users.name, ovms_owners.mail=users.mail, '
+    'UPDATE ovms_owners LEFT JOIN users_field_data ON users_field_data.uid=ovms_owners.owner '
+  . 'SET ovms_owners.pass=users_field_data.pass, ovms_owners.status=users_field_data.status, ovms_owners.name=users_field_data.name, ovms_owners.mail=users_field_data.mail, '
   . '    ovms_owners.deleted=0, ovms_owners.changed=UTC_TIMESTAMP() '
-  . 'WHERE users.pass<>ovms_owners.pass OR users.status<>ovms_owners.status OR users.name<>ovms_owners.name OR users.mail<>ovms_owners.mail');
+  . 'WHERE users_field_data.pass<>ovms_owners.pass OR users_field_data.status<>ovms_owners.status OR users_field_data.name<>ovms_owners.name OR users_field_data.mail<>ovms_owners.mail');
 
   FunctionCall('DbDoSQL',
-    'UPDATE ovms_owners SET deleted=1,changed=UTC_TIMESTAMP() WHERE deleted=0 AND owner NOT IN (SELECT uid FROM users)');
+    'UPDATE ovms_owners SET deleted=1,changed=UTC_TIMESTAMP() WHERE deleted=0 AND owner NOT IN (SELECT uid FROM users_field_data)');
   }
 
 1;
